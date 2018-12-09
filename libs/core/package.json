@@ -1,0 +1,20 @@
+{
+  "name": "@angular-tracing/core",
+  "version": "0.0.1",
+  "description": "A distributed tracing library for use with Angular",
+  "author": "Eric Hauser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ewhauser/angular-tracing.git"
+  },
+  "homepage": "https://github.com/ewhauser/angular-tracing.git",
+  "keywords": [
+    "angular",
+    "tracing"
+  ],
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "@angular/common": "^6.0.0 || 7.1.0",
+    "@angular/core": "^6.0.0 || 7.1.0"
+  }
+}

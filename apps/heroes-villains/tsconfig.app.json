@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc/apps/heroes-villains",
+    "types": []
+  },
+  "exclude": ["test.ts", "**/*.spec.ts", "karma.conf.ts"],
+  "include": ["**/*.ts"]
+}
