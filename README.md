@@ -18,6 +18,8 @@ _Note_: This library is currently a heavy work in progress so expect there to be
 - Open http://localhost:4200 and click through some page
 - Open the Zipkin UI at http://localhost:9411 and view the traces
 
+![Browser traces in Zipkin](https://user-images.githubusercontent.com/131389/49890350-b67a8680-fdf8-11e8-97ac-9d2c815621ec.png)
+
 You can view the source of the example Angular application being traced under `apps/heroes-villains`.
 
 # Usage
