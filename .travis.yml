@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - '8'
+dist: trusty
+sudo: required
+
+install:
+  - yarn install
+
+script:
+  - yarn test
+
+addons:
+  chrome: stable
