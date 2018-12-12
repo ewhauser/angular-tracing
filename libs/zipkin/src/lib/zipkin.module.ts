@@ -21,6 +21,7 @@ import { ZipkinHttpInterceptor } from './zipkin-http-interceptor';
 import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { ZipkinTraceProviderOptions } from './types';
 import { ZipkinTraceDirective } from './zipkin-trace.directive';
+import { NavigationStart, Router } from '@angular/router';
 
 export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
 
@@ -38,6 +39,20 @@ export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
   exports: TRACE_DIRECTIVES
 })
 export class ZipkinModule {
+  /**
+   * Subscribes to the router and clears the root span when a new router event occurs.
+   *
+   * @param router
+   * @param traceRoot
+   */
+  constructor(private router: Router, private traceRoot: ZipkinTraceRoot) {
+    router.events.subscribe(e => {
+      if (e instanceof NavigationStart) {
+        traceRoot.clear();
+      }
+    });
+  }
+
   /**
    * Configures the module for use at the root level of the application
    *
