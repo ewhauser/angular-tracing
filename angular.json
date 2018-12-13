@@ -102,7 +102,7 @@
             "polyfills": "apps/heroes-villains/src/polyfills.ts",
             "tsConfig": "apps/heroes-villains/tsconfig.spec.json",
             "karmaConfig": "apps/heroes-villains/karma.conf.js",
-            "styles": ["apps/heroes-villains/src/styles.css"],
+            "styles": ["apps/heroes-villains/src/styles.scss"],
             "scripts": [],
             "assets": ["apps/heroes-villains/src/favicon.ico", "apps/heroes-villains/src/assets"]
           }
@@ -111,31 +111,6 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": ["apps/heroes-villains/tsconfig.app.json", "apps/heroes-villains/tsconfig.spec.json"],
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      }
-    },
-    "heroes-villains-e2e": {
-      "root": "apps/heroes-villains-e2e/",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "apps/heroes-villains-e2e/protractor.conf.js",
-            "devServerTarget": "heroes-villains:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "heroes-villains:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "apps/heroes-villains-e2e/tsconfig.e2e.json",
             "exclude": ["**/node_modules/**"]
           }
         }
