@@ -55,8 +55,9 @@ The `remoteServiceMapping` element maps outbound HTTP requests to a backend serv
 ```typescript
 const function remoteServiceMappings() {
   const mappings = {};
-  mappings[Environment.API_SERVER_ADDRESS] = 'api_server';
-  mappings['api.github.com'] = 'github';
+  mappings['api_server'] = Environment.API_SERVER;
+  mappings['github'] = 'api.github.com';
+  mappings['mapbpx'] = /.*mapbox.com.*/
 }
 
 {
