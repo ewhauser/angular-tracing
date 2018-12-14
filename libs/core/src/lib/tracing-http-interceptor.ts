@@ -70,10 +70,8 @@ export abstract class TracingHttpInterceptor<T extends TraceRoot<R>, R extends a
 
     return Object.keys(this.remoteServiceMappings).find(remoteService => {
       const domain = this.remoteServiceMappings[remoteService];
-      return (
-        (typeof domain === 'string' && domain === url.host) ||
-        (domain instanceof RegExp && url.host && domain.test(url.host))
-      );
+      return ((domain !== undefined && typeof domain === 'string' && domain === url.host) ||
+        (domain instanceof RegExp && url.host && domain.test(url.host))) as boolean;
     });
   }
 }

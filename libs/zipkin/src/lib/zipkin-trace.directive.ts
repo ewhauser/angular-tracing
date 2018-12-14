@@ -24,7 +24,9 @@ import { ZipkinTraceRoot } from './zipkin-trace-root';
 @Directive({
   selector: TRACE_DIRECTIVE_SELECTOR
 })
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ZipkinTraceDirective implements OnInit, AfterViewInit {
   @Input('traceName') name = 'undefined';
   @Input('traceTags') tags: ZipkinTraceTags = {};

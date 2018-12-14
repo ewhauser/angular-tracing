@@ -2,7 +2,11 @@ import * as zipkin from 'zipkin';
 import { Annotation, TraceId } from 'zipkin';
 import LocalOperationStart = zipkin.Annotation.LocalOperationStart;
 import LocalOperationStop = zipkin.Annotation.LocalOperationStop;
+import { Injectable } from '@angular/core';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class LocalTracer {
   private traceId: TraceId | undefined;
 

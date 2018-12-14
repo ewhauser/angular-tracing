@@ -4,7 +4,14 @@ import * as zipkin from 'zipkin';
 import { ExplicitContext, Recorder, sampler, Tracer } from 'zipkin';
 
 import { LocalTracer } from './local-tracer';
+import { Injectable } from '@angular/core';
 
+/**
+ * The trace root is a locator for finding the root span.
+ */
+@Injectable({
+  providedIn: 'root'
+})
 export class ZipkinTraceRoot implements TraceRoot<Tracer> {
   private readonly traceConfig: {
     recorder: zipkin.Recorder;
