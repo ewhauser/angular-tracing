@@ -1,10 +1,10 @@
-import { TraceRoot } from '@angular-tracing/core';
+import { TRACE_LOCAL_SERVICE_NAME, TraceRoot } from '@angular-tracing/core';
 
 import * as zipkin from 'zipkin';
 import { ExplicitContext, Recorder, sampler, Tracer } from 'zipkin';
 
 import { LocalTracer } from './local-tracer';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 
 /**
  * The trace root is a locator for finding the root span.
@@ -20,7 +20,11 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
   };
   private currentTracer: Tracer | undefined;
 
-  constructor(public localServiceName: string, private recorder: Recorder, private sample: sampler.Sampler) {
+  constructor(
+    @Inject(TRACE_LOCAL_SERVICE_NAME) public localServiceName: string,
+    private recorder: Recorder,
+    private sample: sampler.Sampler
+  ) {
     this.traceConfig = {
       recorder: this.recorder,
       localServiceName: this.localServiceName,

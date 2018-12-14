@@ -1,5 +1,6 @@
 import { HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { parse } from 'url';
+import * as URL from 'url-parse';
+const parse = URL;
 import { RemoteHttpServiceMapping, TraceRoot, TraceParticipationStrategy } from './types';
 import { Observable } from 'rxjs';
 
@@ -63,15 +64,15 @@ export abstract class TracingHttpInterceptor<T extends TraceRoot<R>, R extends a
    * @param reqUrl The URL to check
    */
   protected getRemoteServiceName(reqUrl: string): string | undefined {
-    const url = parse(reqUrl, false, true);
-    if (url.host === undefined) {
+    const url = parse(reqUrl);
+    if (url.hostname) {
       return undefined;
     }
 
     return Object.keys(this.remoteServiceMappings).find(remoteService => {
       const domain = this.remoteServiceMappings[remoteService];
-      return ((domain !== undefined && typeof domain === 'string' && domain === url.host) ||
-        (domain instanceof RegExp && url.host && domain.test(url.host))) as boolean;
+      return ((domain !== undefined && typeof domain === 'string' && domain === url.hostname) ||
+        (domain instanceof RegExp && url.hostname && domain.test(url.hostname))) as boolean;
     });
   }
 }

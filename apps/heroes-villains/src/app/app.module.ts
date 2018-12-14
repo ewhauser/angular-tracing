@@ -9,6 +9,12 @@ import { CoreModule } from './core';
 import { AppStoreModule } from './store/store.module';
 import { AboutComponent } from './about.component';
 
+export function getMappings() {
+  const remoteServiceMappings = {};
+  remoteServiceMappings['all'] = /.*/;
+  return remoteServiceMappings;
+}
+
 @NgModule({
   declarations: [AppComponent, AboutComponent],
   imports: [
@@ -20,9 +26,7 @@ import { AboutComponent } from './about.component';
     ZipkinModule.forRoot({
       traceProvider: {
         http: {
-          remoteServiceMapping: {
-            all: /.*/
-          }
+          remoteServiceMapping: getMappings()
         },
         logToConsole: true
       }

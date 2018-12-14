@@ -2,7 +2,8 @@ import * as zipkin from 'zipkin';
 import { Annotation, TraceId } from 'zipkin';
 import LocalOperationStart = zipkin.Annotation.LocalOperationStart;
 import LocalOperationStop = zipkin.Annotation.LocalOperationStop;
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { TRACE_LOCAL_SERVICE_NAME } from '@angular-tracing/core';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { Injectable } from '@angular/core';
 export class LocalTracer {
   private traceId: TraceId | undefined;
 
-  constructor(private localServiceName: string, private tracer: zipkin.Tracer) {}
+  constructor(@Inject(TRACE_LOCAL_SERVICE_NAME) private localServiceName: string, private tracer: zipkin.Tracer) {}
 
   startSpan(name: string) {
     this.traceId = this.tracer.createChildId();

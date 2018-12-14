@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule, Provider } from '@angular/core';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 
 import * as zipkin from 'zipkin';
 import { BatchRecorder, ConsoleRecorder, jsonEncoder, Recorder } from 'zipkin';
@@ -46,7 +46,8 @@ export class ZipkinModule {
    * @param traceRoot
    */
   constructor(private router: Router, private traceRoot: ZipkinTraceRoot) {
-    router.events.subscribe(e => {
+    // https://angular.io/guide/aot-compiler#no-arrow-functions
+    router.events.subscribe(function(e) {
       if (e instanceof NavigationStart) {
         traceRoot.clear();
       }
@@ -58,7 +59,7 @@ export class ZipkinModule {
    *
    * @param options the module options
    */
-  static forRoot(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  static forRoot(options: TraceModuleOptions<ZipkinTraceProviderOptions>): ModuleWithProviders {
     const traceProvider = options.traceProvider;
 
     let recorder: Recorder;
@@ -99,8 +100,6 @@ export class ZipkinModule {
 
     return {
       ngModule: ZipkinModule,
-      declarations: TRACE_DIRECTIVES,
-      exports: TRACE_DIRECTIVES,
       providers: [
         {
           provide: TRACE_LOCAL_SERVICE_NAME,

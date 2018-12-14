@@ -19,5 +19,10 @@
       "node-fetch": ["node_modules/empty-module/index.js"]
     }
   },
+  "angularCompilerOptions": {
+    "strictMetadataEmit": true,
+    "skipTemplateCodegen": true,
+    "fullTemplateTypeCheck": true
+  },
   "exclude": ["node_modules", "tmp"]
 }
