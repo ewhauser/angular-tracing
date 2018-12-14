@@ -99,7 +99,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       [HttpTestingController, HttpClient],
       (httpMock: HttpTestingController, httpClient: HttpClient) => {
         assertRequest(httpClient, NO_MATCH_SERVICE_URL, httpMock, recorder, 0);
-        expect(traceRoot.current()).toBeTruthy();
+        expect(traceRoot.get()).toBeTruthy();
       }
     ));
 
@@ -107,7 +107,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       [HttpTestingController, HttpClient],
       (httpMock: HttpTestingController, httpClient: HttpClient) => {
         assertRequest(httpClient, MATCH_SERVICE_URL, httpMock, recorder, 5);
-        expect(traceRoot.current()).toBeTruthy();
+        expect(traceRoot.get()).toBeTruthy();
       }
     ));
 
@@ -115,7 +115,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       [HttpTestingController, HttpClient],
       (httpMock: HttpTestingController, httpClient: HttpClient) => {
         assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 5);
-        expect(traceRoot.current()).toBeTruthy();
+        expect(traceRoot.get()).toBeTruthy();
       }
     ));
   });
@@ -141,7 +141,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       [HttpTestingController, HttpClient],
       (httpMock: HttpTestingController, httpClient: HttpClient) => {
         assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 0);
-        expect(traceRoot.current()).toBeFalsy();
+        expect(traceRoot.get()).toBeFalsy();
       }
     ));
 
@@ -150,7 +150,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       (httpMock: HttpTestingController, httpClient: HttpClient) => {
         traceRoot.getOrCreate();
         assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 5);
-        expect(traceRoot.current()).toBeTruthy();
+        expect(traceRoot.get()).toBeTruthy();
       }
     ));
   });

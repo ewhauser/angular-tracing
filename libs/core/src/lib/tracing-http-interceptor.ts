@@ -29,7 +29,7 @@ export abstract class TracingHttpInterceptor<T extends TraceRoot<R>, R extends a
    * @param next
    */
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    let span: R | undefined = this.traceRoot.current();
+    let span: R | undefined = this.traceRoot.get();
     if (!span && this.participationStrategy === TraceParticipationStrategy.CHILD_ONLY) {
       return next.handle(req);
     } else {

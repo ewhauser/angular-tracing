@@ -28,7 +28,7 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
     };
   }
 
-  current(): Tracer | undefined {
+  get(): Tracer | undefined {
     return this.currentTracer;
   }
 

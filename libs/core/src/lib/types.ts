@@ -81,7 +81,7 @@ export interface TraceRoot<S extends any = any> extends _TraceRoot {
   /**
    * Gets the current root span or undefined if it does not exist.
    */
-  current(): S | undefined;
+  get(): S | undefined;
 
   /**
    * Gets or creates a root span.
