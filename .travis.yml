@@ -3,12 +3,28 @@ node_js:
   - '8'
 dist: trusty
 sudo: required
-
 install:
   - yarn install
-
 script:
   - yarn test
-
+jobs:
+  include:
+    - stage: npm release
+      if: tag IS present
+      node_js: '8'
+      script: yarn build
+      before_deploy:
+        - cd dist
+      deploy:
+        provider: npm
+        email: '$NPM_EMAIL'
+        api_key: '$NPM_TOKEN'
+        skip_cleanup: true
+        on:
+          tags: true
 addons:
   chrome: stable
+env:
+  global:
+    - secure: NJld68KOTV+VWVObtVT9FxPYdO0vB73wCfFpcCx+e3WeF5aGYvvP1082M2gK8XJoU0QgP8dCVUKhraunyBtPS0lcqSl1kGh0uMu11IJjUhx1QhqNPdZdXnBNfnXOdUHYbOjZcya5aTkRJsgJF8XuTkvZe3lWXK8CTqoqkieVba/y9fG7iY8p2vuT0WHIsEtbrj1XbDcn47+ETZEYDzM+XKHu1st8hmprFZ3fBJpMoIra8GJ8knaTmoKjcDQdzjVFWkEL9DHW/OeLgJuJp48unI+oeUJOnFOeggNnB7zl+xwegYlvOyHnashdRb1/T9UqMNDdQ7y4R2lux3DfqBb7Rws/QtSk7f0DUBSVLlUaoIGWbCMkDP7PqDEViQOlNmTWH3112qW5b8dz3+mYeA9nrGutvcuWm1/nml9ckBJWxH0P8wHIj3RC4Odx2UBAst53jPqoqcFetNA6w9cAFembt8jr7+LtDwu5vx7wwcJy9LhM3BM7xHNtwevqWOmWBwtXUpJ+KYF0T363YPeVuMkgYRvXu3MqHaxhguUOxyM2zObNrCXCEH1Jlu3Kj8Dhxu8AQUIWIkStG1HykJppxpMmOmyhtBoNFCTcUZBekdUfJObRVVDU79q3xjMi6s4kehXuk+3WlECQFlK32VqTqJAD58aQBNpaLCIX15yn9sz3C2c=
+    - secure: fJZ96xLq4OdXLyA54YMyH493r0Z/fk4mIrl3132mMBiJnC1hxjsXjPei1cG1s5zrXylR+5DDnRhTLfQcNu7lfQR0eXHjO10Wu+SmFLjnKsBgqZo7AicTrry1f6xud02zdSW1SaVkIBeTbAyGbdO7WvthEa9kK00p6JhmvLJuKs6gUzFARA+mq9eHqj6GOBrfhaGa0sVtm4rV+2Vxd/LFNB3OMYZleY11Nwj8ATQsV4KlNFGsu6+Ib2N7GFE4NgKLRgrwSwUzSTlEgVVkks/boC0D+J99hn1MZ23sJheeS1dlu0+3IxixnIYRGn3xMEyp6m6GvkfOHswyOWrOW3lDVP4Pbl788Rs0XJBjTXb1nyNpNSX0voYhZfHtfKoAIkOaGEh3zSscgnC5G/QoYNsRBsP+CsmaywyQA6d8eJNXYSNkVIar8NZT5ss4H1+Cp9+My7l0CooW21WpP6xZ+7OllUdK8s7uuB6Acey/nn1p0DKjW1GwmeAEgXXGEFlyN4woiMGF9PDKh88AtOV3V+O3ECbI3j5yT5x+SvX10d0osm6VUZKVcwQB68eEqUgGACoYC+pQRT/ugAfQj2O2qu2a1Gv/LkOPsRY0kzAXhjBzlSxPsSuEsMzXnP+tGt5le2lwVKsVc7m4nvoUYEVn8izJhChCS/oi8bZBwpe7gjzjpmM=

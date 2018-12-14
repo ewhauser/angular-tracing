@@ -1,1 +1,5 @@
-describe('empty spec', () => {});
+describe('empty spec', () => {
+  it('', () => {
+    expect({}).toBeTruthy();
+  });
+});
