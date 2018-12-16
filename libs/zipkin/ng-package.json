@@ -2,6 +2,12 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/libs/angular-tracing-zipkin",
   "lib": {
-    "entryFile": "src/index.ts"
+    "entryFile": "src/index.ts",
+    "umdModuleIds": {
+      "url-parse": "url-parse",
+      "zipkin/index": "zipkin",
+      "zipkin": "zipkin",
+      "zipkin-transport-http": "zipkin-transport-http"
+    }
   }
 }

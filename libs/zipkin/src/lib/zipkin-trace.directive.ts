@@ -1,10 +1,10 @@
 import { AfterViewInit, Directive, Inject, Injectable, Input, OnInit, ViewContainerRef } from '@angular/core';
-import { TRACE_DIRECTIVE_SELECTOR } from '@angular-tracing/core';
-import { TRACE_ROOT_TOKEN } from '@angular-tracing/core';
 
-import { ZipkinTraceTags } from './types';
+import { ZipkinTraceTags } from './zipkin-types';
 import { LocalTracer } from './local-tracer';
 import { ZipkinTraceRoot } from './zipkin-trace-root';
+import { TRACE_DIRECTIVE_SELECTOR } from './trace.directive';
+import { TRACE_ROOT_TOKEN } from './injection-tokens';
 
 /**
  * A directive that allows you to add tracing to elements within templates. You can start tracing by adding the

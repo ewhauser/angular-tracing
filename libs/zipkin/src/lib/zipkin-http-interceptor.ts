@@ -7,14 +7,10 @@ import ZipkinHttpClient = zipkin.Instrumentation.HttpClient;
 import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { Tracer } from 'zipkin';
 
-import {
-  RemoteHttpServiceMapping,
-  TRACE_HTTP_PARTICIPATION_STRATEGY,
-  TRACE_LOCAL_SERVICE_NAME,
-  TraceParticipationStrategy,
-  TracingHttpInterceptor
-} from '@angular-tracing/core';
 import { Inject, Injectable } from '@angular/core';
+import { TracingHttpInterceptor } from './tracing-http-interceptor';
+import { RemoteHttpServiceMapping, TraceParticipationStrategy } from './types';
+import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
 
 /**
  * Traces calls to Angular's {@link HttpClient}

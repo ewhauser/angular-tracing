@@ -1,10 +1,11 @@
-import { TRACE_LOCAL_SERVICE_NAME, TraceRoot } from '@angular-tracing/core';
+import { Inject, Injectable } from '@angular/core';
 
 import * as zipkin from 'zipkin';
 import { ExplicitContext, Recorder, sampler, Tracer } from 'zipkin';
 
 import { LocalTracer } from './local-tracer';
-import { Inject, Injectable } from '@angular/core';
+import { TraceRoot } from './types';
+import { TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
 
 /**
  * The trace root is a locator for finding the root span.

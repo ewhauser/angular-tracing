@@ -1,9 +1,10 @@
+import { Inject, Injectable } from '@angular/core';
+
 import * as zipkin from 'zipkin';
 import { Annotation, TraceId } from 'zipkin';
 import LocalOperationStart = zipkin.Annotation.LocalOperationStart;
 import LocalOperationStop = zipkin.Annotation.LocalOperationStop;
-import { Inject, Injectable } from '@angular/core';
-import { TRACE_LOCAL_SERVICE_NAME } from '@angular-tracing/core';
+import { TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
 
 @Injectable({
   providedIn: 'root'

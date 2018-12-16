@@ -1,18 +1,16 @@
+import { Provider } from '@angular/core';
 import { inject, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { ZipkinHttpInterceptor, ZipkinTraceRoot } from '@angular-tracing/zipkin';
-import {
-  RemoteHttpServiceMapping,
-  TRACE_HTTP_PARTICIPATION_STRATEGY,
-  TRACE_LOCAL_SERVICE_NAME,
-  TraceParticipationStrategy
-} from '@angular-tracing/core';
+
 import { Recorder } from 'zipkin';
 import * as zipkin from 'zipkin';
 import Sampler = zipkin.sampler.Sampler;
 import alwaysSample = zipkin.sampler.alwaysSample;
-import { Provider } from '@angular/core';
+import { ZipkinTraceRoot } from './zipkin-trace-root';
+import { ZipkinHttpInterceptor } from './zipkin-http-interceptor';
+import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
+import { RemoteHttpServiceMapping, TraceParticipationStrategy } from './types';
 
 const NO_MATCH_SERVICE_HOST = 'no.match.service';
 const NO_MATCH_SERVICE_URL = `http://${NO_MATCH_SERVICE_HOST}/`;

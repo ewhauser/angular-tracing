@@ -1,5 +1,6 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
+import { NavigationStart, Router } from '@angular/router';
 
 import * as zipkin from 'zipkin';
 import { BatchRecorder, ConsoleRecorder, jsonEncoder, Recorder } from 'zipkin';
@@ -7,21 +8,14 @@ import { HttpLogger } from 'zipkin-transport-http';
 import alwaysSample = zipkin.sampler.alwaysSample;
 import Sampler = zipkin.sampler.Sampler;
 
-import {
-  RemoteHttpServiceMapping,
-  TRACE_LOCAL_SERVICE_NAME,
-  TRACE_ROOT_TOKEN,
-  TraceModuleOptions,
-  TraceParticipationStrategy
-} from '@angular-tracing/core';
-
 import { MultiplexingRecorder } from './multiplexing-recorder';
 import { LocalTracer } from './local-tracer';
 import { ZipkinHttpInterceptor } from './zipkin-http-interceptor';
 import { ZipkinTraceRoot } from './zipkin-trace-root';
-import { ZipkinTraceProviderOptions } from './types';
+import { ZipkinTraceProviderOptions } from './zipkin-types';
 import { ZipkinTraceDirective } from './zipkin-trace.directive';
-import { NavigationStart, Router } from '@angular/router';
+import { RemoteHttpServiceMapping, TraceModuleOptions, TraceParticipationStrategy } from './types';
+import { TRACE_LOCAL_SERVICE_NAME, TRACE_ROOT_TOKEN } from './injection-tokens';
 
 export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
 
