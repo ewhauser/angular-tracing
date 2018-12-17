@@ -4,7 +4,7 @@
   "lib": {
     "entryFile": "src/index.ts",
     "umdModuleIds": {
-      "url-parse": "url-parse",
+      "url": "url",
       "zipkin/index": "zipkin",
       "zipkin": "zipkin",
       "zipkin-transport-http": "zipkin-transport-http"

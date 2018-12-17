@@ -1,6 +1,6 @@
 {
   "name": "angular-tracing",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "Apache-2.0",
   "scripts": {
     "ng": "ng",
@@ -30,7 +30,7 @@
     "affected": "./node_modules/.bin/nx affected",
     "backend": "json-server --watch apps/heroes-villains/db.json --routes apps/heroes-villains/routes.json --port 7627 --middlewares ./node_modules/json-server-reset",
     "quick": "concurrently \"yarn backend\" \"ng serve heroes-villains\" \"docker run -d -p 9411:9411 openzipkin/zipkin\"",
-    "release": "npm version patch; git push origin master --tag"
+    "release": "npm version patch && pushd libs/zipkin && npm version patch && yarn test && ng build --project zipkin && pushd dist/libs/zipkin && npm publish --access public ."
   },
   "publishConfig": {
     "access": "public"
@@ -96,7 +96,6 @@
     "prettier": "1.15.2",
     "pretty-quick": "^1.8.0",
     "protractor": "~5.4.0",
-    "release-it": "^9.1.0",
     "ts-node": "~7.0.0",
     "tsickle": "0.34.0",
     "tslib": "^1.9.0",
@@ -106,20 +105,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
-    }
-  },
-  "release-it": {
-    "scripts": {
-      "beforeStart": "yarn test && yarn build:libs",
-      "beforeBump": "pushd libs/zipkin",
-      "afterBump": "popd && pushd dist/libs/zipkin && tar -czvf angular-tracing-zipkin-${version}.tar.gz"
-    },
-    "increment": "conventional:angular",
-    "github": {
-      "release": true,
-      "assets": [
-        "dist/lib/zipkin/*.tar.gz"
-      ]
     }
   }
 }

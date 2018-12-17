@@ -1,8 +1,8 @@
 import { HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import * as URL from 'url-parse';
-const parse = URL;
-import { RemoteHttpServiceMapping, TraceRoot, TraceParticipationStrategy } from './types';
+import { parse } from 'url';
 import { Observable } from 'rxjs';
+
+import { RemoteHttpServiceMapping, TraceRoot, TraceParticipationStrategy } from './types';
 
 /**
  * An interceptor for tracing calls made with Angular's {@link HttpClient}.
@@ -61,11 +61,11 @@ export abstract class TracingHttpInterceptor<T extends TraceRoot<R>, R extends a
    * Gets the remote service from the configuration. If the remote service is a string, then
    * an exact match is checked otherwise the regular expression is tested.
    *
-   * @param reqUrl The URL to check
+   * @param reqUrl The request to check
    */
   protected getRemoteServiceName(reqUrl: string): string | undefined {
-    const url = parse(reqUrl);
-    if (url.hostname) {
+    const url: any = parse(reqUrl, false, true);
+    if (!url.hostname) {
       return undefined;
     }
 
