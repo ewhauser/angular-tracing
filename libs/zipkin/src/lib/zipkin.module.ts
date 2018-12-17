@@ -15,7 +15,7 @@ import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { ZipkinTraceProviderOptions } from './zipkin-types';
 import { ZipkinTraceDirective } from './zipkin-trace.directive';
 import { RemoteHttpServiceMapping, TraceModuleOptions, TraceParticipationStrategy } from './types';
-import { TRACE_LOCAL_SERVICE_NAME, TRACE_ROOT_TOKEN } from './injection-tokens';
+import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME, TRACE_ROOT_TOKEN } from './injection-tokens';
 
 export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
 
@@ -54,7 +54,7 @@ export class ZipkinModule {
    * @param options the module options
    */
   static forRoot(options: TraceModuleOptions<ZipkinTraceProviderOptions>): ModuleWithProviders {
-    const traceProvider = options.traceProvider;
+    const traceProvider = options.traceProvider || {};
 
     let recorder: Recorder;
     if (traceProvider.recorder) {
@@ -74,22 +74,30 @@ export class ZipkinModule {
     }
 
     const localServiceName = options.localServiceName ? options.localServiceName : 'browser';
-    const trace = new ZipkinTraceRoot(localServiceName, recorder, new Sampler(alwaysSample));
+    const sampler = traceProvider.sampler ? traceProvider.sampler : new Sampler(alwaysSample);
+    const trace = new ZipkinTraceRoot(localServiceName, recorder, sampler);
 
     const optional: Provider[] = [];
 
     const http = traceProvider.http;
     if (http) {
-      optional.push({
-        multi: true,
-        provide: HTTP_INTERCEPTORS,
-        useValue: new ZipkinHttpInterceptor(
-          http.remoteServiceMapping || new RemoteHttpServiceMapping(),
-          trace,
-          localServiceName,
-          http.participationStrategy || TraceParticipationStrategy.ALWAYS
-        )
-      });
+      const traceParticipationStrategy = http.participationStrategy || TraceParticipationStrategy.ALWAYS;
+      optional.push(
+        {
+          multi: true,
+          provide: HTTP_INTERCEPTORS,
+          useValue: new ZipkinHttpInterceptor(
+            http.remoteServiceMapping || new RemoteHttpServiceMapping(),
+            trace,
+            localServiceName,
+            traceParticipationStrategy
+          )
+        },
+        {
+          provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
+          useValue: traceParticipationStrategy
+        }
+      );
     }
 
     return {

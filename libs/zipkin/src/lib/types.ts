@@ -55,7 +55,7 @@ export interface TraceModuleOptions<T> {
   /**
    * The configuration for the individual trace provider
    */
-  traceProvider: T;
+  traceProvider?: T;
 }
 
 /* tslint:disable */
