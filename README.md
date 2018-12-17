@@ -32,7 +32,7 @@ Add the required modules:
 $ yarn add @angular-tracing/zipkin zipkin zipkin-transport-http
 ```
 
-You'll need to use this [workaround](https://github.com/openzipkin/zipkin-js#typescript) for compiling with `zipkin-transport-http`.
+You'll need to use this [workaround](https://github.com/openzipkin/zipkin-js#typescript) for compiling with `zipkin-transport-http` (note that there are current issues with the Zipkin `0.15.0` release so please use `0.14.3`.
 
 Then add the tracing module to your `app.module`:
 
@@ -65,7 +65,7 @@ const function remoteServiceMappings() {
   const mappings = {};
   mappings['api_server'] = Environment.API_SERVER;
   mappings['github'] = 'api.github.com';
-  mappings['mapbpx'] = /.*mapbox.com.*/
+  mappings['mapbox'] = /.*mapbox.com.*/
 }
 
 {
