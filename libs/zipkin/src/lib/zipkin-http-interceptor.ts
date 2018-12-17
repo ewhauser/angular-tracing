@@ -1,16 +1,16 @@
 import { HttpClient, HttpEvent, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+
 import { of } from 'rxjs';
-import * as zipkin from 'zipkin';
 import { catchError, tap } from 'rxjs/operators';
+import * as zipkin from 'zipkin';
+import { Tracer } from 'zipkin';
 import ZipkinHttpClient = zipkin.Instrumentation.HttpClient;
 
-import { ZipkinTraceRoot } from './zipkin-trace-root';
-import { Tracer } from 'zipkin';
-
-import { Inject, Injectable } from '@angular/core';
+import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
 import { TracingHttpInterceptor } from './tracing-http-interceptor';
 import { RemoteHttpServiceMapping, TraceParticipationStrategy } from './types';
-import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
+import { ZipkinTraceRoot } from './zipkin-trace-root';
 
 /**
  * Traces calls to Angular's {@link HttpClient}
