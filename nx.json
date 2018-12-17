@@ -8,9 +8,6 @@
     "nx.json": "*"
   },
   "projects": {
-    "core": {
-      "tags": []
-    },
     "heroes-villains": {
       "tags": []
     },

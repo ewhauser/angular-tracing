@@ -1,1 +1,1 @@
-../../../core/src/lib/trace.directive.ts
+export const TRACE_DIRECTIVE_SELECTOR = '[trace]';

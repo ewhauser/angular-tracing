@@ -1,7 +1,7 @@
 {
   "name": "angular-tracing",
   "version": "0.0.2",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -106,6 +106,20 @@
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "release-it": {
+    "scripts": {
+      "beforeStart": "yarn test && yarn build:libs",
+      "beforeBump": "pushd libs/zipkin",
+      "afterBump": "popd && pushd dist/libs/zipkin && tar -czvf angular-tracing-zipkin-${version}.tar.gz"
+    },
+    "increment": "conventional:angular",
+    "github": {
+      "release": true,
+      "assets": [
+        "dist/lib/zipkin/*.tar.gz"
+      ]
     }
   }
 }
