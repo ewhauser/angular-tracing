@@ -75,7 +75,8 @@ export class ZipkinModule {
 
     const localServiceName = options.localServiceName ? options.localServiceName : 'browser';
     const sampler = traceProvider.sampler ? traceProvider.sampler : new Sampler(alwaysSample);
-    const trace = new ZipkinTraceRoot(localServiceName, recorder, sampler);
+    const defaultTags = traceProvider.defaultTags || {};
+    const trace = new ZipkinTraceRoot(localServiceName, recorder, sampler, defaultTags);
 
     const optional: Provider[] = [];
 

@@ -3,12 +3,13 @@ import { HttpTraceableOptions } from './types';
 import { Recorder } from 'zipkin';
 import * as zipkin from 'zipkin';
 import Sampler = zipkin.sampler.Sampler;
+import Span = zipkin.model.Span;
 
 /**
  * Tags that can be added to an individual trace
  */
 export interface ZipkinTraceTags {
-  [name: string]: boolean | string | number;
+  [name: string]: string;
 }
 
 export interface ZipkinTraceProviderOptions {
@@ -32,4 +33,8 @@ export interface ZipkinTraceProviderOptions {
    * The sampler to use. By default, AlwaysSample is used.
    */
   sampler?: Sampler;
+  /**
+   * The default tags to add to every tracer.
+   */
+  defaultTags?: ZipkinTraceTags;
 }
