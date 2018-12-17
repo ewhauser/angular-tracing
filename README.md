@@ -26,7 +26,15 @@ You can view the source of the example Angular application being traced under `a
 
 ## Configuration
 
-To get started, Add the tracing module to your `app.module`:
+Add the required modules:
+
+```console
+$ yarn add @angular-tracing/zipkin zipkin zipkin-transport-http
+```
+
+You'll need to use this [workaround](https://github.com/openzipkin/zipkin-js#typescript) for compiling with `zipkin-transport-http`.
+
+Then add the tracing module to your `app.module`:
 
 ```typescript
 @NgModule({
