@@ -14,7 +14,8 @@ jobs:
       node_js: '8'
       script: ng build --prod
       before_deploy:
-        - cd dist
+        - cp README.md dist/libs/zipkin
+        - cd dist/libs/zipkin
       deploy:
         provider: npm
         email: '$NPM_EMAIL'

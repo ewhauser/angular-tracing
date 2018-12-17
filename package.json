@@ -1,6 +1,6 @@
 {
   "name": "angular-tracing",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -32,7 +32,9 @@
     "quick": "concurrently \"yarn backend\" \"ng serve heroes-villains\" \"docker run -d -p 9411:9411 openzipkin/zipkin\"",
     "release": "npm version patch; git push origin master --tag"
   },
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@angular/animations": "^7.1.2",
     "@angular/common": "^7.1.2",

@@ -1,10 +1,28 @@
 {
   "name": "@angular-tracing/zipkin",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "description": "A distributed tracing library for use with Angular",
+  "author": "Eric Hauser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ewhauser/angular-tracing.git"
+  },
+  "homepage": "https://github.com/ewhauser/angular-tracing.git",
+  "keywords": [
+    "angular",
+    "tracing",
+    "distributed-tracing",
+    "observability",
+    "zipkin"
+  ],
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/common": "^7.1.0",
     "@angular/core": "^7.1.0",
-    "@angular-tracing/core": "^0.0.1",
+    "url-parse": "^1.4.4",
     "zipkin": "^0.14.3",
     "zipkin-transport-http": "^0.14.3"
   }
