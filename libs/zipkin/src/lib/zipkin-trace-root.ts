@@ -7,7 +7,7 @@ import { LocalTracer } from './local-tracer';
 import { TraceRoot } from './types';
 import { TRACE_LOCAL_SERVICE_NAME, ZIPKIN_DEFAULT_TAGS, ZIPKIN_RECORDER, ZIPKIN_SAMPLER } from './injection-tokens';
 import { ZipkinTraceTags } from './zipkin-types';
-import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 /**
  * The trace root is a locator for finding the root span.
@@ -23,10 +23,11 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
     // defaultTags?: ZipkinTraceTags,
   };
   private currentTracer: Tracer | undefined;
+  private componentTracer: LocalTracer | undefined;
 
   constructor(
     @Inject(TRACE_LOCAL_SERVICE_NAME) public localServiceName: string,
-    private activatedRoute: ActivatedRoute,
+    private router: Router,
     @Inject(ZIPKIN_RECORDER) private recorder: Recorder,
     @Inject(ZIPKIN_SAMPLER) private sample: sampler.Sampler,
     @Inject(ZIPKIN_DEFAULT_TAGS) private defaultTags?: ZipkinTraceTags
@@ -46,20 +47,36 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
 
   create(): Tracer {
     const ctxImpl = new ExplicitContext();
-    return new Tracer({
+    this.currentTracer = new Tracer({
       ctxImpl,
       ...this.traceConfig
     });
+
+    let route = this.router.routerState.root;
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+    if (route.snapshot) {
+      const component = route.snapshot.component;
+      const name = component && component.hasOwnProperty('name') ? component['name'] : 'component';
+      this.componentTracer = this.localTracer();
+      this.componentTracer.startSpan(name);
+      this.componentTracer.putTag('/window/location/href', window.location.href);
+    }
+    return this.currentTracer;
   }
 
   getOrCreate(): Tracer {
     if (!this.currentTracer) {
-      this.currentTracer = this.create();
+      return this.create();
     }
     return this.currentTracer;
   }
 
   clear(): void {
+    if (this.componentTracer) {
+      this.componentTracer.endSpan();
+    }
     this.currentTracer = undefined;
   }
 

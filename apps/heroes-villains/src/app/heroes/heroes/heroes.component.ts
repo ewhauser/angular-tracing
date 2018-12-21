@@ -9,7 +9,7 @@ import { HeroService } from '../hero.service';
   selector: 'app-heroes',
   templateUrl: './heroes.component.html'
 })
-export class HeroesComponent implements OnInit, AfterViewInit {
+export class HeroesComponent implements OnInit {
   selected: Hero | null;
   heroes$: Observable<Hero[]>;
   message = '?';
@@ -23,12 +23,7 @@ export class HeroesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.tracer.startSpan('heroesComponent');
     this.getHeroes();
-  }
-
-  ngAfterViewInit(): void {
-    this.tracer.endSpan();
   }
 
   add(hero: Hero) {

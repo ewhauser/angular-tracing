@@ -2,20 +2,23 @@ import { Provider } from '@angular/core';
 import { inject, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
 
-import * as zipkin from 'zipkin';
-import Sampler = zipkin.sampler.Sampler;
-import alwaysSample = zipkin.sampler.alwaysSample;
 import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { ZipkinHttpInterceptor } from './zipkin-http-interceptor';
 import {
   TRACE_HTTP_PARTICIPATION_STRATEGY,
   TRACE_HTTP_REMOTE_MAPPINGS,
-  TRACE_LOCAL_SERVICE_NAME
+  TRACE_LOCAL_SERVICE_NAME,
+  ZIPKIN_DEFAULT_TAGS,
+  ZIPKIN_RECORDER,
+  ZIPKIN_SAMPLER
 } from './injection-tokens';
 import { TraceParticipationStrategy } from './types';
 import { TrackingRecorder } from './test-types';
+import { RouterTestingModule } from '@angular/router/testing';
+import * as zipkin from 'zipkin';
+import alwaysSample = zipkin.sampler.alwaysSample;
+import Sampler = zipkin.sampler.Sampler;
 
 const NO_MATCH_SERVICE_HOST = 'no.match.service';
 const NO_MATCH_SERVICE_URL = `http://${NO_MATCH_SERVICE_HOST}/`;
@@ -37,7 +40,6 @@ function assertRequest(
 }
 
 describe(`ZipkinHttpInterceptor`, () => {
-  let traceRoot: ZipkinTraceRoot;
   let recorder: TrackingRecorder;
   const mappings = {};
   mappings['match_service'] = MATCH_SERVICE_HOST;
@@ -45,7 +47,6 @@ describe(`ZipkinHttpInterceptor`, () => {
 
   const reset = () => {
     recorder = new TrackingRecorder();
-    traceRoot = new ZipkinTraceRoot('test', new ActivatedRoute(), recorder, new Sampler(alwaysSample));
   };
 
   const providers: Provider[] = [
@@ -61,11 +62,23 @@ describe(`ZipkinHttpInterceptor`, () => {
     {
       provide: TRACE_HTTP_REMOTE_MAPPINGS,
       useValue: mappings
+    },
+    {
+      provide: ZIPKIN_RECORDER,
+      useFactory: () => recorder
+    },
+    {
+      provide: ZIPKIN_SAMPLER,
+      useValue: new Sampler(alwaysSample)
+    },
+    {
+      provide: ZIPKIN_DEFAULT_TAGS,
+      useValue: {}
     }
   ];
 
   const config = {
-    imports: [HttpClientTestingModule, HttpClientModule],
+    imports: [HttpClientTestingModule, HttpClientModule, RouterTestingModule],
     providers
   };
 
@@ -80,32 +93,32 @@ describe(`ZipkinHttpInterceptor`, () => {
         },
         {
           provide: ZipkinTraceRoot,
-          useValue: traceRoot
+          useClass: ZipkinTraceRoot
         }
       );
       TestBed.configureTestingModule(c);
     });
 
     it('does not create spans for unmatched domains but creates root', inject(
-      [HttpTestingController, HttpClient],
-      (httpMock: HttpTestingController, httpClient: HttpClient) => {
-        assertRequest(httpClient, NO_MATCH_SERVICE_URL, httpMock, recorder, 0);
+      [HttpTestingController, HttpClient, ZipkinTraceRoot],
+      (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
+        assertRequest(httpClient, NO_MATCH_SERVICE_URL, httpMock, recorder, 3);
         expect(traceRoot.get()).toBeTruthy();
       }
     ));
 
     it('creates a span when there is a host match with a string', inject(
-      [HttpTestingController, HttpClient],
-      (httpMock: HttpTestingController, httpClient: HttpClient) => {
-        assertRequest(httpClient, MATCH_SERVICE_URL, httpMock, recorder, 5);
+      [HttpTestingController, HttpClient, ZipkinTraceRoot],
+      (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
+        assertRequest(httpClient, MATCH_SERVICE_URL, httpMock, recorder, 8);
         expect(traceRoot.get()).toBeTruthy();
       }
     ));
 
     it('creates a span when there is a host match with a regex', inject(
-      [HttpTestingController, HttpClient],
-      (httpMock: HttpTestingController, httpClient: HttpClient) => {
-        assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 5);
+      [HttpTestingController, HttpClient, ZipkinTraceRoot],
+      (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
+        assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 8);
         expect(traceRoot.get()).toBeTruthy();
       }
     ));
@@ -122,25 +135,25 @@ describe(`ZipkinHttpInterceptor`, () => {
         },
         {
           provide: ZipkinTraceRoot,
-          useValue: traceRoot
+          useClass: ZipkinTraceRoot
         }
       );
       TestBed.configureTestingModule(c);
     });
 
     it('does not create root span for child only with no parent', inject(
-      [HttpTestingController, HttpClient],
-      (httpMock: HttpTestingController, httpClient: HttpClient) => {
+      [HttpTestingController, HttpClient, ZipkinTraceRoot],
+      (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
         assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 0);
         expect(traceRoot.get()).toBeFalsy();
       }
     ));
 
     it('creates span for child when parent exists', inject(
-      [HttpTestingController, HttpClient],
-      (httpMock: HttpTestingController, httpClient: HttpClient) => {
+      [HttpTestingController, HttpClient, ZipkinTraceRoot],
+      (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
         traceRoot.getOrCreate();
-        assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 5);
+        assertRequest(httpClient, REGEX_MATCH_SERVICE_URL, httpMock, recorder, 8);
         expect(traceRoot.get()).toBeTruthy();
       }
     ));

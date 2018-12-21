@@ -95,12 +95,6 @@ export class ZipkinModule {
           multi: true,
           provide: HTTP_INTERCEPTORS,
           useClass: ZipkinHttpInterceptor
-          /*useValue: new ZipkinHttpInterceptor(
-            http.remoteServiceMapping || new RemoteHttpServiceMapping(),
-            trace,
-            localServiceName,
-            traceParticipationStrategy
-          )*/
         },
         {
           provide: TRACE_HTTP_REMOTE_MAPPINGS,

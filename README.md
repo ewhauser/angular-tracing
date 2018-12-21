@@ -84,7 +84,7 @@ Typical tracing in a component might look soemthing like this:
   selector: 'app-heroes',
   templateUrl: './heroes.component.html'
 })
-export class HeroesComponent implements OnInit, AfterViewInit {
+export class HeroesComponent implements OnInit {
   heroes$: Observable<Hero[]>;
   private tracer: LocalTracer;
 
@@ -94,9 +94,7 @@ export class HeroesComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.localTracer.startSpan('heroesComponent');
     this.getHeroes();
-
     try {
       this.localTracer.startSpan('expensive_history_recording_call');
       this.localTracer.setTags({ user: user.id });
@@ -105,21 +103,14 @@ export class HeroesComponent implements OnInit, AfterViewInit {
       this.localTracer.endSpan();
     }
   }
-
-  ngAfterViewInit(): void {
-    this.localTracer.endSpan();
-  }
 }
 ```
 
 Let's walk through the different pieces:
 
-- The `ZipkinTraceRoot` is a locator for finding the root span. In `zipkin-js`, the root span is created by creating a `Tracer` instance.
+- The `ZipkinTraceRoot` is a locator for finding the root span. In `zipkin-js`, the root span is created by creating a `Tracer` instance. It will automatically detect that it is running inside a component and create a span for the `heroesComponent`
 - The `LocalTracer` is an adapter for runnning Zipkin traces in a synchronous context. Zipkin's `Tracer` class provides a method for doing local traces via a callback pattern.
-- The `startSpan` and `endSpan` methods used in `ngOnInit` and `ngAfterViewInit` will open a close a span so that anything that happens during that span's creation is included in that span.
 - The child span created for `expensive_history_recording_call` will exist as a child of the `heroesComponent` call and a tag of `user` with the user's ID.
-
-What would happen if we didn't open a span for the Heroes component? By default, the `Httpclient` alls made `getHeroes` would be traced but not in the context of a specific span (only in the context of the default application). You can change the configuration so that HTTP calls are not traced unless there is an existing root span.
 
 ## Directives
 
