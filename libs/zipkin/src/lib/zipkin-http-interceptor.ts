@@ -7,7 +7,11 @@ import * as zipkin from 'zipkin';
 import { Tracer } from 'zipkin';
 import ZipkinHttpClient = zipkin.Instrumentation.HttpClient;
 
-import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
+import {
+  TRACE_HTTP_PARTICIPATION_STRATEGY,
+  TRACE_LOCAL_SERVICE_NAME,
+  TRACE_HTTP_REMOTE_MAPPINGS
+} from './injection-tokens';
 import { TracingHttpInterceptor } from './tracing-http-interceptor';
 import { RemoteHttpServiceMapping, TraceParticipationStrategy } from './types';
 import { ZipkinTraceRoot } from './zipkin-trace-root';
@@ -20,7 +24,7 @@ import { ZipkinTraceRoot } from './zipkin-trace-root';
 })
 export class ZipkinHttpInterceptor extends TracingHttpInterceptor<ZipkinTraceRoot, Tracer> {
   constructor(
-    protected remoteServiceMappings: RemoteHttpServiceMapping,
+    @Inject(TRACE_HTTP_REMOTE_MAPPINGS) protected remoteServiceMappings: RemoteHttpServiceMapping,
     protected traceContext: ZipkinTraceRoot,
     @Inject(TRACE_LOCAL_SERVICE_NAME) protected serviceName: string,
     @Inject(TRACE_HTTP_PARTICIPATION_STRATEGY) protected participationStrategy: TraceParticipationStrategy

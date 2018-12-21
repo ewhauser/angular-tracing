@@ -2,15 +2,20 @@ import { Provider } from '@angular/core';
 import { inject, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
-import { Recorder } from 'zipkin';
 import * as zipkin from 'zipkin';
 import Sampler = zipkin.sampler.Sampler;
 import alwaysSample = zipkin.sampler.alwaysSample;
 import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { ZipkinHttpInterceptor } from './zipkin-http-interceptor';
-import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
-import { RemoteHttpServiceMapping, TraceParticipationStrategy } from './types';
+import {
+  TRACE_HTTP_PARTICIPATION_STRATEGY,
+  TRACE_HTTP_REMOTE_MAPPINGS,
+  TRACE_LOCAL_SERVICE_NAME
+} from './injection-tokens';
+import { TraceParticipationStrategy } from './types';
+import { TrackingRecorder } from './test-types';
 
 const NO_MATCH_SERVICE_HOST = 'no.match.service';
 const NO_MATCH_SERVICE_URL = `http://${NO_MATCH_SERVICE_HOST}/`;
@@ -18,18 +23,6 @@ const MATCH_SERVICE_HOST = 'match.service';
 const MATCH_SERVICE_URL = `http://${MATCH_SERVICE_HOST}/`;
 const REGEX_MATCH_SERVICE_HOST = 'regex.match.service';
 const REGEX_MATCH_SERVICE_URL = `http://${REGEX_MATCH_SERVICE_HOST}/`;
-
-class TrackingRecorder implements Recorder {
-  public records: zipkin.Record[] = [];
-
-  record(rec: zipkin.Record): void {
-    this.records.push(rec);
-  }
-
-  assertSize(size: Number) {
-    expect(size).toEqual(this.records.length, 'Mismatched span count');
-  }
-}
 
 function assertRequest(
   httpClient: HttpClient,
@@ -52,7 +45,7 @@ describe(`ZipkinHttpInterceptor`, () => {
 
   const reset = () => {
     recorder = new TrackingRecorder();
-    traceRoot = new ZipkinTraceRoot('test', recorder, new Sampler(alwaysSample));
+    traceRoot = new ZipkinTraceRoot('test', new ActivatedRoute(), recorder, new Sampler(alwaysSample));
   };
 
   const providers: Provider[] = [
@@ -66,7 +59,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       useValue: 'browser'
     },
     {
-      provide: RemoteHttpServiceMapping,
+      provide: TRACE_HTTP_REMOTE_MAPPINGS,
       useValue: mappings
     }
   ];

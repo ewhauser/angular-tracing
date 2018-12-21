@@ -10,29 +10,30 @@ import { TRACE_LOCAL_SERVICE_NAME } from './injection-tokens';
   providedIn: 'root'
 })
 export class LocalTracer {
+  private static readonly localStack: TraceId[] = [];
+
   private traceId: TraceId | undefined;
 
   constructor(@Inject(TRACE_LOCAL_SERVICE_NAME) private localServiceName: string, private tracer: zipkin.Tracer) {}
 
+  private static peek() {
+    return LocalTracer.localStack.length > 0 ? LocalTracer.localStack[LocalTracer.localStack.length - 1] : undefined;
+  }
+
   startSpan(name: string) {
-    this.traceId = this.tracer.createChildId();
+    const currentTraceId = LocalTracer.peek();
+    this.traceId = currentTraceId || this.tracer.createChildId();
     this.tracer.setId(this.traceId);
     this.tracer.recordServiceName(this.localServiceName);
     this.tracer.recordAnnotation(new LocalOperationStart(name));
+    LocalTracer.localStack.push(this.traceId);
+    return this.traceId;
   }
 
   recordMessage(message: string) {
     if (this.traceId) {
       this.tracer.setId(this.traceId);
       this.tracer.recordMessage(message);
-    }
-  }
-
-  recordError(err: any) {
-    if (this.traceId) {
-      this.tracer.setId(this.traceId);
-      this.tracer.recordBinary('error', err.message ? err.message : err.toString());
-      this.tracer.recordAnnotation(new Annotation.LocalOperationStop());
     }
   }
 
@@ -43,10 +44,14 @@ export class LocalTracer {
     }
   }
 
-  endSpan() {
+  endSpan(err?: any) {
     if (this.traceId) {
       this.tracer.setId(this.traceId);
+      if (err) {
+        this.tracer.recordBinary('error', err.message ? err.message : err.toString());
+      }
       this.tracer.recordAnnotation(new LocalOperationStop());
+      LocalTracer.localStack.pop();
     }
   }
 }

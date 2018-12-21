@@ -15,7 +15,15 @@ import { ZipkinTraceRoot } from './zipkin-trace-root';
 import { ZipkinTraceProviderOptions } from './zipkin-types';
 import { ZipkinTraceDirective } from './zipkin-trace.directive';
 import { RemoteHttpServiceMapping, TraceModuleOptions, TraceParticipationStrategy } from './types';
-import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME, TRACE_ROOT_TOKEN } from './injection-tokens';
+import {
+  TRACE_HTTP_PARTICIPATION_STRATEGY,
+  TRACE_LOCAL_SERVICE_NAME,
+  TRACE_HTTP_REMOTE_MAPPINGS,
+  TRACE_ROOT_TOKEN,
+  ZIPKIN_DEFAULT_TAGS,
+  ZIPKIN_RECORDER,
+  ZIPKIN_SAMPLER
+} from './injection-tokens';
 
 export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
 
@@ -76,7 +84,6 @@ export class ZipkinModule {
     const localServiceName = options.localServiceName ? options.localServiceName : 'browser';
     const sampler = traceProvider.sampler ? traceProvider.sampler : new Sampler(alwaysSample);
     const defaultTags = traceProvider.defaultTags || {};
-    const trace = new ZipkinTraceRoot(localServiceName, recorder, sampler, defaultTags);
 
     const optional: Provider[] = [];
 
@@ -87,12 +94,17 @@ export class ZipkinModule {
         {
           multi: true,
           provide: HTTP_INTERCEPTORS,
-          useValue: new ZipkinHttpInterceptor(
+          useClass: ZipkinHttpInterceptor
+          /*useValue: new ZipkinHttpInterceptor(
             http.remoteServiceMapping || new RemoteHttpServiceMapping(),
             trace,
             localServiceName,
             traceParticipationStrategy
-          )
+          )*/
+        },
+        {
+          provide: TRACE_HTTP_REMOTE_MAPPINGS,
+          useValue: http.remoteServiceMapping || new RemoteHttpServiceMapping()
         },
         {
           provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
@@ -110,11 +122,23 @@ export class ZipkinModule {
         },
         {
           provide: TRACE_ROOT_TOKEN,
-          useValue: trace
+          useClass: ZipkinTraceRoot
+        },
+        {
+          provide: ZIPKIN_RECORDER,
+          useValue: recorder
+        },
+        {
+          provide: ZIPKIN_SAMPLER,
+          useValue: sampler
+        },
+        {
+          provide: ZIPKIN_DEFAULT_TAGS,
+          useValue: defaultTags
         },
         {
           provide: ZipkinTraceRoot,
-          useValue: trace
+          useClass: ZipkinTraceRoot
         },
         ...optional
       ]
