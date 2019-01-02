@@ -45,7 +45,17 @@ export class ZipkinHttpInterceptor extends TracingHttpInterceptor<ZipkinTraceRoo
       tracer
     });
 
-    httpClient.recordRequest(req, url, req.method);
+    const request = {
+      url: req.url,
+      headers: {}
+    };
+    const zipkinReq = httpClient.recordRequest(request, url, req.method);
+    const zipkinHeaders = zipkinReq.headers as any;
+
+    req = req.clone({
+      setHeaders: zipkinHeaders
+    });
+
     const traceId = tracer.id;
     return next.handle(req).pipe(
       tap((event: HttpEvent<any>) => {

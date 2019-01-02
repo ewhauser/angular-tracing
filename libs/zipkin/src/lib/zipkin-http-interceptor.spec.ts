@@ -19,6 +19,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import * as zipkin from 'zipkin';
 import alwaysSample = zipkin.sampler.alwaysSample;
 import Sampler = zipkin.sampler.Sampler;
+import { HttpHeaders } from 'zipkin';
 
 const NO_MATCH_SERVICE_HOST = 'no.match.service';
 const NO_MATCH_SERVICE_URL = `http://${NO_MATCH_SERVICE_HOST}/`;
@@ -27,15 +28,25 @@ const MATCH_SERVICE_URL = `http://${MATCH_SERVICE_HOST}/`;
 const REGEX_MATCH_SERVICE_HOST = 'regex.match.service';
 const REGEX_MATCH_SERVICE_URL = `http://${REGEX_MATCH_SERVICE_HOST}/`;
 
+const EXPECTED_B3_HEADERS = [HttpHeaders.TraceId, HttpHeaders.SpanId, HttpHeaders.ParentSpanId, HttpHeaders.Sampled];
+
 function assertRequest(
   httpClient: HttpClient,
   url,
   httpMock: HttpTestingController,
   recorder: TrackingRecorder,
-  size: number
+  size: number,
+  clientTraced: boolean = true
 ) {
   httpClient.post(url, {}).subscribe();
-  httpMock.expectOne(url);
+  const request = httpMock.expectOne(url);
+  if (size > 0 && clientTraced) {
+    for (const header of EXPECTED_B3_HEADERS) {
+      expect(request.request.headers.has(header)).toBeTruthy(
+        `Expected ${JSON.stringify(request.request.headers)} to contain ${header}`
+      );
+    }
+  }
   recorder.assertSize(size);
 }
 
@@ -102,7 +113,7 @@ describe(`ZipkinHttpInterceptor`, () => {
     it('does not create spans for unmatched domains but creates root', inject(
       [HttpTestingController, HttpClient, ZipkinTraceRoot],
       (httpMock: HttpTestingController, httpClient: HttpClient, traceRoot: ZipkinTraceRoot) => {
-        assertRequest(httpClient, NO_MATCH_SERVICE_URL, httpMock, recorder, 3);
+        assertRequest(httpClient, NO_MATCH_SERVICE_URL, httpMock, recorder, 3, false);
         expect(traceRoot.get()).toBeTruthy();
       }
     ));
