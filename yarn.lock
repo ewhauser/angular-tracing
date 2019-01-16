@@ -5498,13 +5498,10 @@ node-fetch@1.6.3:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-fetch@^1.5.3:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-1.7.3.tgz#980f6f72d85211a5347c6b2bc18c5b84c3eb47ef"
-  integrity sha512-NhZ4CsKx7cYm2vSrBAr2PvFOe6sWDf0UYLRqA6svUYg7+/TSfVAu49jYC4BvQ4Sms9SZgdqGBgroqfDhJdTyKQ==
-  dependencies:
-    encoding "^0.1.11"
-    is-stream "^1.0.1"
+node-fetch@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
+  integrity sha512-MOd8pV3fxENbryESLgVIeaGKrdl+uaYhCSSVkjeOb/31/njTpcis5aWfdqgNlHIrKOLRbMnfPINPOML2CIFeXA==
 
 node-forge@0.7.5:
   version "0.7.5"
@@ -8963,17 +8960,17 @@ yn@^2.0.0:
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
   integrity sha1-5a2ryKz0CPY4X8dklWhMiOavaJo=
 
-zipkin-transport-http@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/zipkin-transport-http/-/zipkin-transport-http-0.15.0.tgz#8aa538107c2faeede094366fa9f5a33ae92e594b"
-  integrity sha512-q4w6TMVkHdAgPswoRIP5IPrYMLK8SdSpM/eYs80FsMRG65yt7gzdPNZ7h6+UvqeFfgxfX2HrelPJeXRSlNdTvg==
+zipkin-transport-http@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/zipkin-transport-http/-/zipkin-transport-http-0.16.0.tgz#2980be6f408153a954425957bbae8cbdc9f224e6"
+  integrity sha512-RbspapRrfG9H7YCU9lB2UJJIe2dfJkAC6+ShPc8+qLTnXG/V9ObIY7r+QsUZmvIwH7IRZ4jki/rnoB6Q6dbfTA==
   dependencies:
-    node-fetch "^1.5.3"
+    node-fetch "^2.3.0"
 
-zipkin@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/zipkin/-/zipkin-0.15.0.tgz#3f8e9c0e2914b6d2ffb5d5fd6a41529a48ce02b4"
-  integrity sha512-kKzRYWErW93bLh0kzyGPa7rQN49IN+TdeWWDNrF5r/B1VyPbj0Hqmwp2h0bsRiaukd+DBjprj22GbatOCjDVWA==
+zipkin@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/zipkin/-/zipkin-0.16.0.tgz#5b40d58b7bc938454c49d7bcfaffe147a2d3ed46"
+  integrity sha512-/WhDWzCjOxR+dbvQwZY0LanNt6+2Fwm72nZenm7Bz/EVV1OBs222wJ/clmKtPWzkmeECakoYB35WSNAuBnGxFQ==
   dependencies:
     base64-js "^1.1.2"
     is-promise "^2.1.0"
