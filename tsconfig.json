@@ -3,20 +3,23 @@
   "compilerOptions": {
     "importHelpers": true,
     "sourceMap": true,
+    "inlineSources": true,
     "declaration": false,
+    "module": "es2015",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictNullChecks": true,
     "target": "es2015",
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2017", "dom"],
+    "lib": ["es2018", "dom"],
     "baseUrl": ".",
     "paths": {
       "@angular-tracing/core": ["libs/core/src/index.ts"],
       "@angular-tracing/zipkin": ["libs/zipkin/src/index.ts"],
       "os": ["node_modules/empty-module/index.js"],
-      "node-fetch": ["node_modules/empty-module/index.js"]
+      "node-fetch": ["node_modules/empty-module/index.js"],
+      "zipkin": ["node_modules/zipkin/dist/zipkin.js"]
     }
   },
   "angularCompilerOptions": {
