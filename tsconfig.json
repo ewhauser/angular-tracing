@@ -25,7 +25,8 @@
   "angularCompilerOptions": {
     "strictMetadataEmit": true,
     "skipTemplateCodegen": true,
-    "fullTemplateTypeCheck": true
+    "fullTemplateTypeCheck": true,
+    "debug": true
   },
   "exclude": ["node_modules", "tmp"]
 }

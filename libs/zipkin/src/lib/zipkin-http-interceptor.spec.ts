@@ -9,7 +9,8 @@ import {
   TRACE_HTTP_PARTICIPATION_STRATEGY,
   TRACE_HTTP_REMOTE_MAPPINGS,
   TRACE_LOCAL_SERVICE_NAME,
-  ZIPKIN_DEFAULT_TAGS,
+  TRACE_PROVIDER_CONFIGURATION,
+  TRACE_ROOT_TOKEN,
   ZIPKIN_RECORDER,
   ZIPKIN_SAMPLER
 } from './injection-tokens';
@@ -58,6 +59,7 @@ describe(`ZipkinHttpInterceptor`, () => {
 
   const reset = () => {
     recorder = new TrackingRecorder();
+    ZipkinTraceRoot.clear();
   };
 
   const providers: Provider[] = [
@@ -83,7 +85,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       useValue: new Sampler(alwaysSample)
     },
     {
-      provide: ZIPKIN_DEFAULT_TAGS,
+      provide: TRACE_PROVIDER_CONFIGURATION,
       useValue: {}
     }
   ];
@@ -103,7 +105,7 @@ describe(`ZipkinHttpInterceptor`, () => {
           useValue: TraceParticipationStrategy.ALWAYS
         },
         {
-          provide: ZipkinTraceRoot,
+          provide: TRACE_ROOT_TOKEN,
           useClass: ZipkinTraceRoot
         }
       );
@@ -145,7 +147,7 @@ describe(`ZipkinHttpInterceptor`, () => {
           useValue: TraceParticipationStrategy.CHILD_ONLY
         },
         {
-          provide: ZipkinTraceRoot,
+          provide: TRACE_ROOT_TOKEN,
           useClass: ZipkinTraceRoot
         }
       );

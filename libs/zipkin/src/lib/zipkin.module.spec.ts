@@ -40,9 +40,6 @@ describe('ZipkinModule for root', () => {
       const traceRoot = TestBed.get(TRACE_ROOT_TOKEN) as ZipkinTraceRoot;
       expect(traceRoot).toBeTruthy();
     });
-    it('does not inject the HTTP interceptor', () => {
-      expect(() => TestBed.get(HTTP_INTERCEPTORS)).toThrow();
-    });
   });
   describe('with empty HTTP config', () => {
     beforeEach(() => {

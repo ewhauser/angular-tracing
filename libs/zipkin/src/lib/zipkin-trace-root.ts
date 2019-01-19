@@ -5,9 +5,18 @@ import { ExplicitContext, Recorder, sampler, Tracer } from 'zipkin';
 
 import { LocalTracer } from './local-tracer';
 import { TraceRoot } from './types';
-import { TRACE_LOCAL_SERVICE_NAME, ZIPKIN_DEFAULT_TAGS, ZIPKIN_RECORDER, ZIPKIN_SAMPLER } from './injection-tokens';
-import { ZipkinTraceTags } from './zipkin-types';
+import {
+  TRACE_LOCAL_SERVICE_NAME,
+  TRACE_PROVIDER_CONFIGURATION,
+  ZIPKIN_RECORDER,
+  ZIPKIN_SAMPLER
+} from './injection-tokens';
+import { ZipkinTraceProviderOptions } from './zipkin-types';
 import { Router } from '@angular/router';
+import alwaysSample = zipkin.sampler.alwaysSample;
+import Sampler = zipkin.sampler.Sampler;
+
+let currentTracer: Tracer | undefined;
 
 /**
  * The trace root is a locator for finding the root span.
@@ -22,32 +31,35 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
     sampler: zipkin.sampler.Sampler;
     // defaultTags?: ZipkinTraceTags,
   };
-  private currentTracer: Tracer | undefined;
   private componentTracer: LocalTracer | undefined;
+
+  static clear() {
+    currentTracer = undefined;
+  }
 
   constructor(
     @Inject(TRACE_LOCAL_SERVICE_NAME) public localServiceName: string,
     private router: Router,
     @Inject(ZIPKIN_RECORDER) private recorder: Recorder,
     @Inject(ZIPKIN_SAMPLER) private sample: sampler.Sampler,
-    @Inject(ZIPKIN_DEFAULT_TAGS) private defaultTags?: ZipkinTraceTags
+    @Inject(TRACE_PROVIDER_CONFIGURATION) private config: ZipkinTraceProviderOptions
   ) {
     this.traceConfig = {
-      recorder: this.recorder,
-      localServiceName: this.localServiceName,
+      recorder,
+      localServiceName,
       sampler: this.sample
       // Enable this once on the latest version of zipkin-js: https://github.com/ewhauser/angular-tracing/issues/5
-      // defaultTags: this.defaultTags,
+      // defaultTags: this.config.defaultTags || {},
     };
   }
 
   get(): Tracer | undefined {
-    return this.currentTracer;
+    return currentTracer;
   }
 
   create(): Tracer {
     const ctxImpl = new ExplicitContext();
-    this.currentTracer = new Tracer({
+    currentTracer = new Tracer({
       ctxImpl,
       ...this.traceConfig
     });
@@ -63,21 +75,21 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
       this.componentTracer.startSpan(name);
       this.componentTracer.putTag('/window/location/href', window.location.href);
     }
-    return this.currentTracer;
+    return currentTracer;
   }
 
   getOrCreate(): Tracer {
-    if (!this.currentTracer) {
+    if (!currentTracer) {
       return this.create();
     }
-    return this.currentTracer;
+    return currentTracer;
   }
 
   clear(): void {
     if (this.componentTracer) {
       this.componentTracer.endSpan();
     }
-    this.currentTracer = undefined;
+    ZipkinTraceRoot.clear();
   }
 
   localTracer(): LocalTracer {

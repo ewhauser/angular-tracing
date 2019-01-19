@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 
 import * as zipkin from 'zipkin';
@@ -19,8 +19,9 @@ import {
   TRACE_HTTP_PARTICIPATION_STRATEGY,
   TRACE_LOCAL_SERVICE_NAME,
   TRACE_HTTP_REMOTE_MAPPINGS,
+  TRACE_MODULE_CONFIGURATION,
+  TRACE_PROVIDER_CONFIGURATION,
   TRACE_ROOT_TOKEN,
-  ZIPKIN_DEFAULT_TAGS,
   ZIPKIN_RECORDER,
   ZIPKIN_SAMPLER
 } from './injection-tokens';
@@ -62,80 +63,108 @@ export class ZipkinModule {
    * @param options the module options
    */
   static forRoot(options: TraceModuleOptions<ZipkinTraceProviderOptions>): ModuleWithProviders {
-    const traceProvider = options.traceProvider || {};
-
-    let recorder: Recorder;
-    if (traceProvider.recorder) {
-      recorder = traceProvider.recorder;
-    } else {
-      const zipkinBaseUrl = traceProvider.zipkinBaseUrl || 'http://localhost:9411';
-      recorder = new BatchRecorder({
-        logger: new HttpLogger({
-          endpoint: `${zipkinBaseUrl}/api/v2/spans`,
-          jsonEncoder: jsonEncoder.JSON_V2
-        })
-      });
-    }
-
-    if (traceProvider.logToConsole && !(recorder instanceof ConsoleRecorder)) {
-      recorder = new MultiplexingRecorder([new ConsoleRecorder(), recorder]);
-    }
-
-    const localServiceName = options.localServiceName ? options.localServiceName : 'browser';
-    const sampler = traceProvider.sampler ? traceProvider.sampler : new Sampler(alwaysSample);
-    const defaultTags = traceProvider.defaultTags || {};
-
-    const optional: Provider[] = [];
-
-    const http = traceProvider.http;
-    if (http) {
-      const traceParticipationStrategy = http.participationStrategy || TraceParticipationStrategy.ALWAYS;
-      optional.push(
-        {
-          multi: true,
-          provide: HTTP_INTERCEPTORS,
-          useClass: ZipkinHttpInterceptor
-        },
-        {
-          provide: TRACE_HTTP_REMOTE_MAPPINGS,
-          useValue: http.remoteServiceMapping || new RemoteHttpServiceMapping()
-        },
-        {
-          provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
-          useValue: traceParticipationStrategy
-        }
-      );
-    }
-
     return {
       ngModule: ZipkinModule,
       providers: [
         {
-          provide: TRACE_LOCAL_SERVICE_NAME,
-          useValue: localServiceName
+          provide: TRACE_MODULE_CONFIGURATION,
+          useValue: options
+        },
+        {
+          provide: TRACE_PROVIDER_CONFIGURATION,
+          useValue: options.traceProvider || {}
         },
         {
           provide: TRACE_ROOT_TOKEN,
-          useClass: ZipkinTraceRoot
+          useClass: ZipkinTraceRoot,
+          deps: [TRACE_LOCAL_SERVICE_NAME, Router, ZIPKIN_RECORDER, ZIPKIN_SAMPLER]
+        },
+        {
+          multi: true,
+          provide: HTTP_INTERCEPTORS,
+          useClass: ZipkinHttpInterceptor,
+          deps: [
+            TRACE_HTTP_REMOTE_MAPPINGS,
+            TRACE_ROOT_TOKEN,
+            TRACE_LOCAL_SERVICE_NAME,
+            TRACE_HTTP_PARTICIPATION_STRATEGY
+          ]
+        },
+        {
+          provide: TRACE_LOCAL_SERVICE_NAME,
+          useFactory: getLocalServiceName,
+          deps: [TRACE_MODULE_CONFIGURATION]
         },
         {
           provide: ZIPKIN_RECORDER,
-          useValue: recorder
+          useFactory: getRecorder,
+          deps: [TRACE_MODULE_CONFIGURATION]
         },
         {
           provide: ZIPKIN_SAMPLER,
-          useValue: sampler
+          useFactory: getSampler,
+          deps: [TRACE_MODULE_CONFIGURATION]
         },
         {
-          provide: ZIPKIN_DEFAULT_TAGS,
-          useValue: defaultTags
+          provide: TRACE_HTTP_REMOTE_MAPPINGS,
+          useFactory: getRemoteServiceMappings,
+          deps: [TRACE_MODULE_CONFIGURATION]
         },
         {
-          provide: ZipkinTraceRoot,
-          useClass: ZipkinTraceRoot
-        },
-        ...optional
+          provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
+          useFactory: getTraceParticipationStrategy,
+          deps: [TRACE_MODULE_CONFIGURATION]
+        }
       ]
     };
   }
+}
+
+export function getLocalServiceName(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  return options.localServiceName ? options.localServiceName : 'browser';
+}
+
+export function getRecorder(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  const traceProvider = options.traceProvider || {};
+
+  let recorder: Recorder;
+  if (traceProvider.recorder) {
+    recorder = traceProvider.recorder;
+  } else {
+    const zipkinBaseUrl = traceProvider.zipkinBaseUrl || 'http://localhost:9411';
+    recorder = new BatchRecorder({
+      logger: new HttpLogger({
+        endpoint: `${zipkinBaseUrl}/api/v2/spans`,
+        jsonEncoder: jsonEncoder.JSON_V2
+      })
+    });
+  }
+
+  if (traceProvider.logToConsole && !(recorder instanceof ConsoleRecorder)) {
+    recorder = new MultiplexingRecorder([new ConsoleRecorder(), recorder]);
+  }
+  return recorder;
+}
+
+export function getSampler(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  const traceProvider = options.traceProvider || {};
+  return traceProvider.sampler ? traceProvider.sampler : new Sampler(alwaysSample);
+}
+
+export function getRemoteServiceMappings(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  const provider = options.traceProvider;
+  let mappings = {};
+  if (provider && provider.http && provider.http.participationStrategy) {
+    mappings = provider.http.remoteServiceMapping || new RemoteHttpServiceMapping();
+  }
+  return mappings;
+}
+
+export function getTraceParticipationStrategy(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+  const provider = options.traceProvider;
+  let traceParticipationStrategy = TraceParticipationStrategy.ALWAYS;
+  if (provider && provider.http && provider.http.participationStrategy) {
+    traceParticipationStrategy = provider.http.participationStrategy;
+  }
+  return traceParticipationStrategy;
 }
