@@ -1,6 +1,6 @@
 {
   "name": "@angular-tracing/zipkin",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A distributed tracing library for use with Angular",
   "author": "Eric Hauser",
   "repository": {
