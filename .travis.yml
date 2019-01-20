@@ -4,7 +4,7 @@ node_js:
 dist: trusty
 sudo: required
 install:
-  - yarn install
+  - yarn build:libs
 script:
   - yarn test
 jobs:
