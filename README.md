@@ -41,7 +41,7 @@ Then add the tracing module to your `app.module`:
   declarations: [...],
   imports: [
     ...
-    ZipkinModule.forRoot({
+    ZipkinModule.forRootWithConfig({
       traceProvider: {
         http: {
           remoteServiceMapping: {
@@ -71,6 +71,37 @@ const function remoteServiceMappings() {
 {
   remoteServiceMapping: remoteServiceMappings()
 }
+```
+
+If you are compiling in AOT mode and have a complex configuration, you may want to inject your configuration as opposed to configuring inline to avoid the dreaded: `Functions calls are not allowed in decorators` error:
+
+```typescript
+
+export function getZipkinConfig() {
+  return {
+    traceProvider: {
+      http: {
+       remoteServiceMapping: {
+          all: /.*/
+        }
+      },
+      logToConsole: true
+    }
+  };
+}
+
+@NgModule({
+  declarations: [...],
+  imports: [
+    ...
+    ZipkinModule.forRoot(),
+  ],
+  providers: [ {
+    { provides: TRACE_MODULE_CONFIGURATION, useFactory: getZipkinConfig }
+  }],
+  bootstrap: [...]
+})
+export class AppModule {}
 ```
 
 The default configuration will setup tracing of the `HttpClient` and send to a remote Zipkin service operating at `https://localhost:9411`. For additional configuration options, please see the [core](https://github.com/ewhauser/angular-tracing) and [zipkin](https://github.com/ewhauser/angular-tracing) configuration definitions.

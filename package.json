@@ -29,7 +29,7 @@
     "help": "./node_modules/.bin/nx help",
     "affected": "./node_modules/.bin/nx affected",
     "backend": "json-server --watch apps/heroes-villains/db.json --routes apps/heroes-villains/routes.json --port 7627 --middlewares ./node_modules/json-server-reset",
-    "quick": "concurrently \"yarn backend\" \"ng serve --prod heroes-villains\" \"docker run -d -p 9411:9411 openzipkin/zipkin\"",
+    "quick": "concurrently \"yarn backend\" \"ng serve heroes-villains\" \"docker run -d -p 9411:9411 openzipkin/zipkin\"",
     "release": "npm version patch && pushd libs/zipkin && npm version patch && yarn test && ng build --project zipkin && pushd dist/libs/zipkin && npm publish --access public ."
   },
   "publishConfig": {

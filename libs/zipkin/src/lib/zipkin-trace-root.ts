@@ -4,10 +4,10 @@ import * as zipkin from 'zipkin';
 import { ExplicitContext, Recorder, sampler, Tracer } from 'zipkin';
 
 import { LocalTracer } from './local-tracer';
-import { TraceRoot } from './types';
+import { TraceModuleOptions, TraceRoot } from './types';
 import {
   TRACE_LOCAL_SERVICE_NAME,
-  TRACE_PROVIDER_CONFIGURATION,
+  TRACE_MODULE_CONFIGURATION,
   ZIPKIN_RECORDER,
   ZIPKIN_SAMPLER
 } from './injection-tokens';
@@ -42,7 +42,7 @@ export class ZipkinTraceRoot implements TraceRoot<Tracer> {
     private router: Router,
     @Inject(ZIPKIN_RECORDER) private recorder: Recorder,
     @Inject(ZIPKIN_SAMPLER) private sample: sampler.Sampler,
-    @Inject(TRACE_PROVIDER_CONFIGURATION) private config: ZipkinTraceProviderOptions
+    @Inject(TRACE_MODULE_CONFIGURATION) private config: TraceModuleOptions<ZipkinTraceProviderOptions>
   ) {
     this.traceConfig = {
       recorder,

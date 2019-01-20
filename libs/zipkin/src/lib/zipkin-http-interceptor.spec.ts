@@ -9,7 +9,7 @@ import {
   TRACE_HTTP_PARTICIPATION_STRATEGY,
   TRACE_HTTP_REMOTE_MAPPINGS,
   TRACE_LOCAL_SERVICE_NAME,
-  TRACE_PROVIDER_CONFIGURATION,
+  TRACE_MODULE_CONFIGURATION,
   TRACE_ROOT_TOKEN,
   ZIPKIN_RECORDER,
   ZIPKIN_SAMPLER
@@ -85,7 +85,7 @@ describe(`ZipkinHttpInterceptor`, () => {
       useValue: new Sampler(alwaysSample)
     },
     {
-      provide: TRACE_PROVIDER_CONFIGURATION,
+      provide: TRACE_MODULE_CONFIGURATION,
       useValue: {}
     }
   ];

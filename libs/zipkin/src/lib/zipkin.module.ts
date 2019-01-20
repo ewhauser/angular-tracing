@@ -20,13 +20,51 @@ import {
   TRACE_LOCAL_SERVICE_NAME,
   TRACE_HTTP_REMOTE_MAPPINGS,
   TRACE_MODULE_CONFIGURATION,
-  TRACE_PROVIDER_CONFIGURATION,
   TRACE_ROOT_TOKEN,
   ZIPKIN_RECORDER,
   ZIPKIN_SAMPLER
 } from './injection-tokens';
 
 export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
+
+const TRACE_PROVIDERS = [
+  {
+    provide: TRACE_ROOT_TOKEN,
+    useClass: ZipkinTraceRoot,
+    deps: [TRACE_LOCAL_SERVICE_NAME, Router, ZIPKIN_RECORDER, ZIPKIN_SAMPLER]
+  },
+  {
+    multi: true,
+    provide: HTTP_INTERCEPTORS,
+    useClass: ZipkinHttpInterceptor,
+    deps: [TRACE_HTTP_REMOTE_MAPPINGS, TRACE_ROOT_TOKEN, TRACE_LOCAL_SERVICE_NAME, TRACE_HTTP_PARTICIPATION_STRATEGY]
+  },
+  {
+    provide: TRACE_LOCAL_SERVICE_NAME,
+    useFactory: getLocalServiceName,
+    deps: [TRACE_MODULE_CONFIGURATION]
+  },
+  {
+    provide: ZIPKIN_RECORDER,
+    useFactory: getRecorder,
+    deps: [TRACE_MODULE_CONFIGURATION]
+  },
+  {
+    provide: ZIPKIN_SAMPLER,
+    useFactory: getSampler,
+    deps: [TRACE_MODULE_CONFIGURATION]
+  },
+  {
+    provide: TRACE_HTTP_REMOTE_MAPPINGS,
+    useFactory: getRemoteServiceMappings,
+    deps: [TRACE_MODULE_CONFIGURATION]
+  },
+  {
+    provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
+    useFactory: getTraceParticipationStrategy,
+    deps: [TRACE_MODULE_CONFIGURATION]
+  }
+];
 
 /**
  * Module for distributed tracing with Angular. The module will setup the connection to the tracing provider
@@ -58,11 +96,22 @@ export class ZipkinModule {
   }
 
   /**
-   * Configures the module for use at the root level of the application
+   * Configures the module for use at the root level of the application. If you use this method, then it is
+   * expected that you are injecting the configuration via DI.
+   */
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: ZipkinModule,
+      providers: TRACE_PROVIDERS
+    };
+  }
+
+  /**
+   * Configures the module for use at the root level of the application with an explicit configuration.
    *
    * @param options the module options
    */
-  static forRoot(options: TraceModuleOptions<ZipkinTraceProviderOptions>): ModuleWithProviders {
+  static forRootWithConfig(options: TraceModuleOptions<ZipkinTraceProviderOptions>): ModuleWithProviders {
     return {
       ngModule: ZipkinModule,
       providers: [
@@ -70,51 +119,7 @@ export class ZipkinModule {
           provide: TRACE_MODULE_CONFIGURATION,
           useValue: options
         },
-        {
-          provide: TRACE_PROVIDER_CONFIGURATION,
-          useValue: options.traceProvider || {}
-        },
-        {
-          provide: TRACE_ROOT_TOKEN,
-          useClass: ZipkinTraceRoot,
-          deps: [TRACE_LOCAL_SERVICE_NAME, Router, ZIPKIN_RECORDER, ZIPKIN_SAMPLER]
-        },
-        {
-          multi: true,
-          provide: HTTP_INTERCEPTORS,
-          useClass: ZipkinHttpInterceptor,
-          deps: [
-            TRACE_HTTP_REMOTE_MAPPINGS,
-            TRACE_ROOT_TOKEN,
-            TRACE_LOCAL_SERVICE_NAME,
-            TRACE_HTTP_PARTICIPATION_STRATEGY
-          ]
-        },
-        {
-          provide: TRACE_LOCAL_SERVICE_NAME,
-          useFactory: getLocalServiceName,
-          deps: [TRACE_MODULE_CONFIGURATION]
-        },
-        {
-          provide: ZIPKIN_RECORDER,
-          useFactory: getRecorder,
-          deps: [TRACE_MODULE_CONFIGURATION]
-        },
-        {
-          provide: ZIPKIN_SAMPLER,
-          useFactory: getSampler,
-          deps: [TRACE_MODULE_CONFIGURATION]
-        },
-        {
-          provide: TRACE_HTTP_REMOTE_MAPPINGS,
-          useFactory: getRemoteServiceMappings,
-          deps: [TRACE_MODULE_CONFIGURATION]
-        },
-        {
-          provide: TRACE_HTTP_PARTICIPATION_STRATEGY,
-          useFactory: getTraceParticipationStrategy,
-          deps: [TRACE_MODULE_CONFIGURATION]
-        }
+        ...TRACE_PROVIDERS
       ]
     };
   }
@@ -152,18 +157,18 @@ export function getSampler(options: TraceModuleOptions<ZipkinTraceProviderOption
 }
 
 export function getRemoteServiceMappings(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
-  const provider = options.traceProvider;
+  const provider = options.traceProvider || {};
   let mappings = {};
-  if (provider && provider.http && provider.http.participationStrategy) {
+  if (provider.http) {
     mappings = provider.http.remoteServiceMapping || new RemoteHttpServiceMapping();
   }
   return mappings;
 }
 
 export function getTraceParticipationStrategy(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
-  const provider = options.traceProvider;
+  const provider = options.traceProvider || {};
   let traceParticipationStrategy = TraceParticipationStrategy.ALWAYS;
-  if (provider && provider.http && provider.http.participationStrategy) {
+  if (provider.http && provider.http.participationStrategy) {
     traceParticipationStrategy = provider.http.participationStrategy;
   }
   return traceParticipationStrategy;

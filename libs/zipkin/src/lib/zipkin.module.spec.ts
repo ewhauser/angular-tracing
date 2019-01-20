@@ -4,16 +4,22 @@ import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { TRACE_HTTP_PARTICIPATION_STRATEGY, TRACE_LOCAL_SERVICE_NAME, TRACE_ROOT_TOKEN } from './injection-tokens';
+import {
+  TRACE_HTTP_PARTICIPATION_STRATEGY,
+  TRACE_LOCAL_SERVICE_NAME,
+  TRACE_MODULE_CONFIGURATION,
+  TRACE_ROOT_TOKEN
+} from './injection-tokens';
 import { TraceParticipationStrategy } from './types';
 import { ZipkinModule } from './zipkin.module';
 import { ZipkinTraceRoot } from './zipkin-trace-root';
 
 const MODULES = [RouterModule, RouterTestingModule];
 
-function createModule(provider: Provider | ModuleWithProviders) {
+function createModule(provider: Provider | ModuleWithProviders, providers: Provider[] = []) {
   TestBed.configureTestingModule({
-    imports: [...MODULES, provider]
+    imports: [...MODULES, provider],
+    providers
   }).compileComponents();
 }
 
@@ -30,7 +36,25 @@ describe('ZipkinModule with no configuration', () => {
 describe('ZipkinModule for root', () => {
   describe('with empty config', () => {
     beforeEach(() => {
-      createModule(ZipkinModule.forRoot({}));
+      createModule(ZipkinModule.forRootWithConfig({}));
+    });
+
+    it('defines the browser name', () => {
+      expect(TestBed.get(TRACE_LOCAL_SERVICE_NAME)).toEqual('browser');
+    });
+    it('creates the trace root', () => {
+      const traceRoot = TestBed.get(TRACE_ROOT_TOKEN) as ZipkinTraceRoot;
+      expect(traceRoot).toBeTruthy();
+    });
+  });
+  describe('with config as provider', () => {
+    beforeEach(() => {
+      createModule(ZipkinModule.forRoot(), [
+        {
+          provide: TRACE_MODULE_CONFIGURATION,
+          useValue: {}
+        }
+      ]);
     });
 
     it('defines the browser name', () => {
@@ -44,7 +68,7 @@ describe('ZipkinModule for root', () => {
   describe('with empty HTTP config', () => {
     beforeEach(() => {
       createModule(
-        ZipkinModule.forRoot({
+        ZipkinModule.forRootWithConfig({
           traceProvider: {
             http: {}
           }
@@ -61,7 +85,7 @@ describe('ZipkinModule for root', () => {
   describe('can override HTTP config', () => {
     beforeEach(() => {
       createModule(
-        ZipkinModule.forRoot({
+        ZipkinModule.forRootWithConfig({
           traceProvider: {
             http: {
               participationStrategy: TraceParticipationStrategy.CHILD_ONLY
