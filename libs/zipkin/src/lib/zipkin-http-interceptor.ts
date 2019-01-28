@@ -1,7 +1,7 @@
-import { HttpClient, HttpEvent, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 
-import { of } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import * as zipkin from 'zipkin';
 import { Tracer } from 'zipkin';
@@ -64,9 +64,9 @@ export class ZipkinHttpInterceptor extends TracingHttpInterceptor<ZipkinTraceRoo
           httpClient.recordResponse(traceId, event.status.toString());
         }
       }),
-      catchError((err: any, caught: any) => {
+      catchError((err: any) => {
         httpClient.recordError(traceId, err);
-        return of(caught);
+        return throwError(err);
       })
     );
   }
