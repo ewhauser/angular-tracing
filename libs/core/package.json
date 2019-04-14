@@ -14,8 +14,8 @@
   ],
   "license": "Apache-2.0",
   "peerDependencies": {
-    "@angular/common": "^6.0.0 || 7.1.0",
-    "@angular/core": "^6.0.0 || 7.1.0",
+    "@angular/common": "^6.0.0 || 7.1.0 || 7.2",
+    "@angular/core": "^6.0.0 || 7.1.0 || 7.2",
     "url-parse": "^1.4.4"
   }
 }
