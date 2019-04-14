@@ -54,7 +54,7 @@
     "@ngrx/store": "6.1.2",
     "@ngrx/store-devtools": "6.1.2",
     "@nrwl/nx": "7.1.1",
-    "bulma": "0.7.2",
+    "bulma": "0.7.4",
     "core-js": "2.6.0",
     "empty-module": "0.0.2",
     "express": "4.16.4",
