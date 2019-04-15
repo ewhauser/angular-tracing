@@ -60,7 +60,7 @@
     "express": "4.16.4",
     "font-awesome": "4.7.0",
     "ngrx-data": "6.1.0-beta.3",
-    "rxjs": "6.3.3",
+    "rxjs": "6.4.0",
     "tslib": "1.9.3",
     "url-parse": "1.4.4",
     "zipkin": "0.16.0",
