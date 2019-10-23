@@ -5,4 +5,9 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {}
+export class AppComponent {
+  get test(): string {
+    console.log(`Date.now: ${Date.now().toString()}`);
+    return 'test';
+  }
+}
