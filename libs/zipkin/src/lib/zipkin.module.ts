@@ -1,6 +1,7 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
+import { NgZone } from '@angular/core';
 
 import * as zipkin from 'zipkin';
 import { BatchRecorder, ConsoleRecorder, jsonEncoder, Recorder } from 'zipkin';
@@ -47,7 +48,7 @@ const TRACE_PROVIDERS = [
   {
     provide: ZIPKIN_RECORDER,
     useFactory: getRecorder,
-    deps: [TRACE_MODULE_CONFIGURATION]
+    deps: [TRACE_MODULE_CONFIGURATION, NgZone]
   },
   {
     provide: ZIPKIN_SAMPLER,
@@ -129,7 +130,7 @@ export function getLocalServiceName(options: TraceModuleOptions<ZipkinTraceProvi
   return options.localServiceName ? options.localServiceName : 'browser';
 }
 
-export function getRecorder(options: TraceModuleOptions<ZipkinTraceProviderOptions>) {
+export function getRecorder(options: TraceModuleOptions<ZipkinTraceProviderOptions>, zone: NgZone) {
   const traceProvider = options.traceProvider || {};
 
   let recorder: Recorder;
@@ -137,11 +138,13 @@ export function getRecorder(options: TraceModuleOptions<ZipkinTraceProviderOptio
     recorder = traceProvider.recorder;
   } else {
     const zipkinBaseUrl = traceProvider.zipkinBaseUrl || 'http://localhost:9411';
-    recorder = new BatchRecorder({
-      logger: new HttpLogger({
-        endpoint: `${zipkinBaseUrl}/api/v2/spans`,
-        jsonEncoder: jsonEncoder.JSON_V2
-      })
+    zone.runOutsideAngular(() => {
+      recorder = new BatchRecorder({
+        logger: new HttpLogger({
+          endpoint: `${zipkinBaseUrl}/api/v2/spans`,
+          jsonEncoder: jsonEncoder.JSON_V2
+        })
+      });
     });
   }
 
