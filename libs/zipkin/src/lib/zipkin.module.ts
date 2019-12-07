@@ -31,13 +31,13 @@ export const TRACE_DIRECTIVES = [ZipkinTraceDirective];
 const TRACE_PROVIDERS = [
   {
     provide: TRACE_ROOT_TOKEN,
-    useClass: ZipkinTraceRoot,
+    useExisting: ZipkinTraceRoot,
     deps: [TRACE_LOCAL_SERVICE_NAME, Router, ZIPKIN_RECORDER, ZIPKIN_SAMPLER]
   },
   {
     multi: true,
     provide: HTTP_INTERCEPTORS,
-    useClass: ZipkinHttpInterceptor,
+    useExisting: ZipkinHttpInterceptor,
     deps: [TRACE_HTTP_REMOTE_MAPPINGS, TRACE_ROOT_TOKEN, TRACE_LOCAL_SERVICE_NAME, TRACE_HTTP_PARTICIPATION_STRATEGY]
   },
   {
@@ -88,10 +88,9 @@ export class ZipkinModule {
    * @param traceRoot
    */
   constructor(private router: Router, private traceRoot: ZipkinTraceRoot) {
-    // https://angular.io/guide/aot-compiler#no-arrow-functions
-    router.events.subscribe(function(e) {
+    this.router.events.subscribe(e => {
       if (e instanceof NavigationStart) {
-        traceRoot.clear();
+        this.traceRoot.clear();
       }
     });
   }

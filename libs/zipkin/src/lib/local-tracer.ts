@@ -22,7 +22,7 @@ export class LocalTracer {
 
   startSpan(name: string) {
     const currentTraceId = LocalTracer.peek();
-    this.traceId = currentTraceId || this.tracer.createChildId();
+    this.traceId = this.tracer.createChildId(currentTraceId);
     this.tracer.setId(this.traceId);
     this.tracer.recordServiceName(this.localServiceName);
     this.tracer.recordAnnotation(new LocalOperationStart(name));
