@@ -57,7 +57,7 @@
     "bulma": "0.7.2",
     "core-js": "2.6.0",
     "empty-module": "0.0.2",
-    "express": "4.16.4",
+    "express": "4.17.3",
     "font-awesome": "4.7.0",
     "ngrx-data": "6.1.0-beta.3",
     "rxjs": "6.3.3",
